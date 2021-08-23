@@ -2,13 +2,12 @@ import addEventsDragAndDrop from './draging.js';
 
 let collection = [];
 const form = document.getElementById('addTodo');
+const getData = JSON.parse(localStorage.getItem('todoList'));
 
 const statusCheck = ((ev) => {
   const buttonId = ev.target.id;
-  const dataGet = localStorage.getItem('todoList');
-  const data = JSON.parse(dataGet);
-  if (data) {
-    collection = data;
+  if (getData) {
+    collection = getData;
   }
   const rtest = collection[collection.findIndex((x) => x.index === parseInt(buttonId, 10))];
   const last = collection.indexOf(rtest);
@@ -20,7 +19,7 @@ const statusCheck = ((ev) => {
   localStorage.setItem('todoList', JSON.stringify(collection));
 });
 
-const ShowList = ((arr) => {
+const showList = ((arr) => {
   const listToDo = arr.map((b) => `
     <ul class="testList1" draggable="true">
           <li><input type="checkbox" id='${b.index}' value='${b.completed}' class="checkboX" ${b.completed ? 'checked' : 'unchecked'}>
@@ -46,22 +45,21 @@ const addToList = (() => {
   collection.push(toDoTask);
   localStorage.setItem('todoList', JSON.stringify(collection));
   if (collection.length > 0) {
-    ShowList(collection);
+    showList(collection);
   }
   form.reset();
 });
 
 const editTask = ((ev) => {
   const buttonID = ev.target.id;
-  const dataGet = localStorage.getItem('todoList');
-  const data = JSON.parse(dataGet);
-  if (data) {
-    collection = data;
+  if (getData) {
+    collection = getData;
   }
   const btnId = collection[collection.findIndex((x) => x.index === parseInt(buttonID, 10))];
   const last = collection.indexOf(btnId);
   const test = ev.target.parentNode;
   const editInput = test.querySelector('p');
+  const errorMsg = test.querySelector('small');
   editInput.contentEditable = true;
   editInput.classList.add('test');
   const a = test.querySelector('.fa-ellipsis-v');
@@ -72,14 +70,10 @@ const editTask = ((ev) => {
 
   editInput.addEventListener('keyup', () => {
     if (editInput.innerHTML.length > 0) {
-      const listItem = document.getElementById('showListItem');
-      const errorMsg = listItem.querySelector('small');
       errorMsg.style.display = 'none';
       collection[last].description = editInput.innerHTML;
       localStorage.setItem('todoList', JSON.stringify(collection));
     } else if (editInput.innerHTML.length === 0) {
-      const listItem = document.getElementById('showListItem');
-      const errorMsg = listItem.querySelector('small');
       errorMsg.style.display = 'block';
       errorMsg.innerText = 'Please enter some text';
       errorMsg.classList.add('small');
@@ -100,7 +94,7 @@ const removeTodo = ((ev) => {
     collection[i].index = i + a;
   }
   localStorage.setItem('todoList', JSON.stringify(collection));
-  ShowList(collection);
+  showList(collection);
 });
 
 const removeCompleted = (() => {
@@ -110,17 +104,15 @@ const removeCompleted = (() => {
     collection[i].index = i + b;
   }
   localStorage.setItem('todoList', JSON.stringify(collection));
-  ShowList(collection);
+  showList(collection);
 });
 
 window.addEventListener('load', () => {
-  const dataGet = localStorage.getItem('todoList');
-  const data = JSON.parse(dataGet);
-  if (data) {
-    collection = data;
+  if (getData) {
+    collection = getData;
   }
   if (collection.length > 0) {
-    ShowList(collection);
+    showList(collection);
   }
 });
 
